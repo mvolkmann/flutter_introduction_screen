@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show SystemChrome, SystemUiOverlayStyle;
 import 'package:introduction_screen/introduction_screen.dart';
 
 const title = 'My App';
 
 void main() {
-  // Make the status bar background transparent.
+  // Make the status bar background transparent so the background color
+  // of the onboarding pages will also appear in the status bar
+  // without being shaded.
   SystemChrome.setSystemUIOverlayStyle(
-    // Using dark instead of light so the text on the status bar
-    // will be gray instead of white.
+    // We are using dark instead of light so the text
+    // on the status bar will be gray instead of white.
     SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent),
   );
 
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: _Onboarding(),
+      home: Onboarding(),
       theme: ThemeData(primarySwatch: Colors.blue),
       title: title,
     ),
@@ -34,8 +36,8 @@ class PageData {
   });
 }
 
-class _Onboarding extends StatelessWidget {
-  _Onboarding({Key? key}) : super(key: key);
+class Onboarding extends StatelessWidget {
+  Onboarding({Key? key}) : super(key: key);
 
   final pages = [
     PageData(
@@ -60,8 +62,8 @@ class _Onboarding extends StatelessWidget {
     ),
   ];
 
-  void _onIntroEnd(context) {
-    // Using pushReplacement instead of push so
+  void endOnboarding(context) {
+    // We are using pushReplacement instead of push so
     // there is no back button for returning to Onboarding.
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => Home()),
@@ -71,11 +73,15 @@ class _Onboarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IntroductionScreen(
+      // Tapping this exits onboarding.
       done: Text('Done'),
-      globalBackgroundColor: Colors.yellow,
-      isTopSafeArea: true, // so image doesn't overlap safe area
+      globalBackgroundColor: Colors.yellow.shade100,
+      // This prevents the images from overlapping the safe area.
+      isTopSafeArea: true,
+      // This icon appears on the last onboarding page.
+      // Tapping it ends onboarding.
       next: Icon(Icons.navigate_next),
-      onDone: () => _onIntroEnd(context),
+      onDone: () => endOnboarding(context),
       pages: pages
           .map(
             (page) => PageViewModel(
@@ -85,6 +91,8 @@ class _Onboarding extends StatelessWidget {
             ),
           )
           .toList(),
+      // The skip button appears on all onboarding pages except the last.
+      // Tapping it advances to the last onboarding page.
       showSkipButton: true,
       skip: Text('Skip'),
     );
